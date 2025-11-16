@@ -7,59 +7,105 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   color: #333;
+  font-family: Arial, Helvetica, sans-serif;
+}
+/* Maintenance Layout */
+.maintenance-page {
+  background: #ffffff;
 }
 
-/* Header */
-.app-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.maintenance-header {
+  background: #8a1414;
+  color: #ffffff;
+  padding: 12px 40px;
 }
 
-.app-header h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.maintenance-header-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.app-header p {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #666;
+.maintenance-brand-left {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.maintenance-brand-right {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.maintenance-logo {
+  height: 56px;
+  object-fit: contain;
 }
 
 /* Main Content */
-.app-main {
+.maintenance-main {
   flex: 1;
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 30px 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.maintenance-card {
+  max-width: 900px;
   width: 100%;
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 32px 32px;
+  background: #fafafa;
 }
 
-.app-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 2rem;
-  height: 100%;
+.maintenance-info {
+  margin: 0 0 8px 0;
+  font-size: 14px;
 }
 
-.panel {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.maintenance-divider {
+  border-top: 1px solid #e0e0e0;
+  margin: 16px 0 24px;
+}
+
+.maintenance-title {
+  text-align: center;
+  color: #8a1414;
+  font-size: 22px;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+}
+
+.maintenance-message {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 14px;
+}
+
+.maintenance-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  border: 2px solid #8a1414;
+}
+
+.maintenance-thanks {
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+.maintenance-footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  font-size: 13px;
+}
+
+.maintenance-footer-links span {
+  cursor: default;
 }
 
 .control-section {
@@ -581,40 +627,17 @@
 }
 
 /* Footer */
-.app-footer {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 1.5rem 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.footer-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.footer-content p {
-  margin: 0 0 1rem 0;
-  color: #666;
-}
-
-.footer-links {
+.maintenance-security-footer {
+  padding: 10px 40px 20px;
   display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-.footer-links a {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-  color: #764ba2;
+.maintenance-security-badge {
+  border: 1px solid #d0d0d0;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 4px;
 }
 
 /* Responsive Design */

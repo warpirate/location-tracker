@@ -2,9 +2,15 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { locationService } from '../config/supabase'
 import { brazeLocationService, initializeBraze } from '../config/braze'
 
-// Generate a unique user ID for this session
+// Generate a meaningful user identifier for this session
 const generateUserId = () => {
-  return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  const timestamp = new Date().toISOString()
+  const browser = navigator.userAgent.split(' ').slice(-2).join(' ') // Get browser info
+  const platform = navigator.platform || 'unknown'
+  const language = navigator.language || 'unknown'
+  const randomId = Math.random().toString(36).substr(2, 9)
+  
+  return `${browser}_${platform}_${language}_${timestamp}_${randomId}`
 }
 
 export const useGeolocation = () => {
@@ -64,7 +70,12 @@ export const useGeolocation = () => {
       accuracy: locationData.accuracy,
       altitude: locationData.altitude,
       altitude_accuracy: locationData.altitudeAccuracy,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      user_agent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      screen_resolution: `${window.screen.width}x${window.screen.height}`,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     })
 
     if (result.success) {
