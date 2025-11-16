@@ -5,25 +5,41 @@ import './App.css'
 function App() {
   const { getCurrentLocation, startTracking, location, error, loading, isTracking } = useGeolocation()
 
+  // Debug function to reset permission and try again
+  const resetAndRetry = () => {
+    console.log('🔄 Manual reset triggered')
+    localStorage.removeItem('locationPermissionGranted')
+    window.location.reload()
+  }
+
   useEffect(() => {
+    console.log('🚀 App useEffect triggered')
+    
     if ('geolocation' in navigator) {
       // Check if user has previously granted permission
       const hasLocationPermission = localStorage.getItem('locationPermissionGranted')
+      console.log('🔍 Checking localStorage permission:', hasLocationPermission)
       
       if (hasLocationPermission === 'true') {
         // Start continuous tracking immediately if permission was previously granted
+        console.log('✅ Permission already granted, starting tracking...')
         startTracking()
       } else {
         // Request location permission first
+        console.log('❓ No permission found, requesting location...')
         getCurrentLocation().then(() => {
           // If successful, mark permission as granted and start continuous tracking
+          console.log('✅ Permission granted! Setting localStorage and starting tracking...')
           localStorage.setItem('locationPermissionGranted', 'true')
           startTracking()
-        }).catch(() => {
+        }).catch((error) => {
           // Permission denied or error
+          console.error('❌ Permission denied or error:', error)
           localStorage.setItem('locationPermissionGranted', 'false')
         })
       }
+    } else {
+      console.error('❌ Geolocation not available in navigator')
     }
   }, [getCurrentLocation, startTracking])
 
@@ -65,6 +81,7 @@ function App() {
             <span>Security Tips</span>
             <span>Demo</span>
           </div>
+
         </section>
       </main>
 

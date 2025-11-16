@@ -20,6 +20,8 @@ export const useGeolocation = () => {
   
   const watchId = useRef(null)
   const intervalId = useRef(null)
+  const retryCount = useRef(0)
+  const maxRetries = 3
 
   // Test database connection on mount
   useEffect(() => {
@@ -34,12 +36,6 @@ export const useGeolocation = () => {
     testDb()
   }, [])
 
-  // Geolocation options
-  const geoOptions = {
-    enableHighAccuracy: true,
-    timeout: 10000,
-    maximumAge: 0
-  }
 
   // Save location to database
   const saveLocationToDb = useCallback(async (locationData) => {
@@ -100,37 +96,85 @@ export const useGeolocation = () => {
     switch (error.code) {
       case error.PERMISSION_DENIED:
         errorMessage = 'Location access denied by user'
+        retryCount.current = 0 // Reset retry count on permission denied
         break
       case error.POSITION_UNAVAILABLE:
-        errorMessage = 'Location information unavailable'
+        errorMessage = 'Location information unavailable - this may be due to poor GPS signal or rate limiting'
         break
       case error.TIMEOUT:
-        errorMessage = 'Location request timed out'
+        errorMessage = 'Location request timed out - trying with less aggressive settings'
         break
       default:
         errorMessage = `Geolocation error: ${error.message}`
     }
 
+    // Implement exponential backoff for retries
+    if (error.code !== error.PERMISSION_DENIED && retryCount.current < maxRetries) {
+      retryCount.current++
+      const backoffTime = Math.pow(2, retryCount.current) * 1000 // 2s, 4s, 8s
+      console.log(`⏳ Retrying location request in ${backoffTime/1000}s (attempt ${retryCount.current}/${maxRetries})`)
+      
+      setTimeout(() => {
+        console.log('🔄 Retrying location request...')
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            retryCount.current = 0 // Reset on success
+            handleSuccess(position)
+          },
+          handleError,
+          {
+            enableHighAccuracy: false,
+            timeout: 45000, // Even longer timeout for retries
+            maximumAge: 600000 // 10 minute cache for retries
+          }
+        )
+      }, backoffTime)
+    } else {
+      retryCount.current = 0 // Reset retry count
+    }
+
     setError(errorMessage)
     setLoading(false)
-    console.error('Geolocation error:', errorMessage)
+    console.error('❌ Geolocation error:', errorMessage, 'Code:', error.code)
   }, [])
 
   // Get current location (one-time) using browser geolocation
   const getCurrentLocation = useCallback(async () => {
+    console.log('🎯 getCurrentLocation called')
+    
     if (!navigator.geolocation) {
       const errorMsg = 'Geolocation is not supported by this browser'
       setError(errorMsg)
+      console.error('❌ Geolocation not supported')
       throw new Error(errorMsg)
+    }
+
+    // Check current permission state
+    if (navigator.permissions) {
+      try {
+        const permission = await navigator.permissions.query({name: 'geolocation'})
+        console.log('🔐 Current geolocation permission:', permission.state)
+        
+        if (permission.state === 'denied') {
+          const errorMsg = 'Location permission is denied. Please enable it in browser settings.'
+          setError(errorMsg)
+          localStorage.setItem('locationPermissionGranted', 'false')
+          throw new Error(errorMsg)
+        }
+      } catch (permError) {
+        console.log('⚠️ Could not check permission state:', permError)
+      }
     }
 
     setLoading(true)
     setError(null)
+    console.log('📍 Requesting location...')
 
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
+            console.log('✅ Location obtained:', position)
             const coords = position.coords
             const locationData = {
               latitude: coords.latitude,
@@ -146,12 +190,13 @@ export const useGeolocation = () => {
             setLoading(false)
             
             // Save to database
+            console.log('💾 Saving to database...')
             await saveLocationToDb(locationData)
             
-            console.log('Location captured:', locationData)
+            console.log('✅ Location captured and saved:', locationData)
             resolve(locationData)
           } catch (error) {
-            console.error('Error processing location:', error)
+            console.error('❌ Error processing location:', error)
             setError('Failed to process location data')
             setLoading(false)
             reject(error)
@@ -163,6 +208,8 @@ export const useGeolocation = () => {
           switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = 'Location access denied by user'
+              localStorage.setItem('locationPermissionGranted', 'false')
+              console.error('❌ Permission denied - clearing localStorage flag')
               break
             case error.POSITION_UNAVAILABLE:
               errorMessage = 'Location information unavailable'
@@ -176,13 +223,13 @@ export const useGeolocation = () => {
 
           setError(errorMessage)
           setLoading(false)
-          console.error('Geolocation error:', errorMessage)
+          console.error('❌ Geolocation error:', errorMessage, 'Code:', error.code)
           reject(new Error(errorMessage))
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+          enableHighAccuracy: false, // Less aggressive to avoid rate limits
+          timeout: 30000, // Longer timeout for better reliability
+          maximumAge: 60000 // Cache location for 1 minute to reduce API calls
         }
       )
     })
@@ -216,16 +263,16 @@ export const useGeolocation = () => {
         }
       },
       {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 30000 // Update more frequently - every 30 seconds
+        enableHighAccuracy: false, // Less aggressive to avoid rate limits
+        timeout: 30000, // Longer timeout for better reliability  
+        maximumAge: 300000 // Cache for 5 minutes to reduce rate limiting
       }
     )
 
     // Store watch ID for cleanup
     watchId.current = browserWatchId
 
-    // Also set up a periodic backup to ensure regular updates
+    // Set up a less frequent periodic backup to avoid rate limits
     intervalId.current = setInterval(() => {
       console.log('🔄 Periodic location update check...')
       navigator.geolocation.getCurrentPosition(
@@ -237,12 +284,12 @@ export const useGeolocation = () => {
           console.log('🔄 Periodic location update failed:', error.message)
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+          enableHighAccuracy: false, // Less aggressive
+          timeout: 30000, // Longer timeout
+          maximumAge: 300000 // 5 minute cache
         }
       )
-    }, 60000) // Every 60 seconds
+    }, 300000) // Every 5 minutes to avoid rate limits
 
     console.log('Started continuous location tracking with browser geolocation + periodic backup')
   }, [isTracking, saveLocationToDb, handleSuccess, handleError])
