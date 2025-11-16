@@ -409,6 +409,16 @@
   color: #f44336;
 }
 
+.update-time {
+  border-left: 4px solid #27ae60 !important;
+  margin-top: 0.5rem;
+}
+
+.updated-ago {
+  color: #27ae60;
+  font-weight: 500;
+}
+
 .loading-section {
   text-align: center;
   padding: 2rem;

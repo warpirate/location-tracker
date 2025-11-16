@@ -1,12 +1,31 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { locationService } from '../config/supabase'
 
-// Generate a simple user identifier for this session
-const generateUserId = () => {
-  const timestamp = Date.now()
-  const randomId = Math.random().toString(36).substr(2, 9)
-  
-  return `user_${timestamp}_${randomId}`
+// Generate a device identifier and store it persistently
+const generateDeviceId = () => {
+  try {
+    // Try to get existing device ID from storage
+    const storedId = localStorage.getItem('device_id')
+    
+    if (storedId) {
+      console.log('Using existing device ID:', storedId)
+      return storedId
+    }
+    
+    // If no ID exists, create a new one
+    const timestamp = Date.now()
+    const randomId = Math.random().toString(36).substr(2, 9)
+    const deviceId = `device_${timestamp}_${randomId}`
+    
+    // Store it for future use
+    localStorage.setItem('device_id', deviceId)
+    console.log('Created and stored new device ID:', deviceId)
+    return deviceId
+  } catch (error) {
+    console.error('Error managing device ID:', error)
+    // Fallback to a temporary ID if storage fails
+    return `temp_${Date.now()}`
+  }
 }
 
 export const useGeolocation = () => {
@@ -14,7 +33,7 @@ export const useGeolocation = () => {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [isTracking, setIsTracking] = useState(false)
-  const [userId] = useState(() => generateUserId())
+  const [userId] = useState(() => generateDeviceId())
   const [locationHistory, setLocationHistory] = useState([])
   const [dbStatus, setDbStatus] = useState({ connected: false, message: '' })
   

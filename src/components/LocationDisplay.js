@@ -1,5 +1,6 @@
 import React from 'react'
 
+
 const LocationDisplay = ({ location, error, loading, userId, dbStatus, brazeStatus, brazeUserId }) => {
   const formatCoordinate = (coord) => {
     return coord ? coord.toFixed(8) : 'N/A'
@@ -89,6 +90,13 @@ const LocationDisplay = ({ location, error, loading, userId, dbStatus, brazeStat
                 {new Date(location.timestamp).toLocaleString()}
               </span>
             </div>
+            
+            {location.time_since_update && (
+              <div className="location-item update-time">
+                <span className="label">Last updated:</span>
+                <span className="value updated-ago">{location.time_since_update}</span>
+              </div>
+            )}
           </div>
           
           <div className="map-section">

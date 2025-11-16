@@ -11,18 +11,80 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Database operations
 export const locationService = {
-  // Insert a new location record
+  // Upsert a location record (update if exists, insert if not)
   async insertLocation(locationData) {
     try {
-      const { data, error } = await supabase
+      // First check if we already have a record for this device
+      const { data: existingData, error: fetchError } = await supabase
         .from('locations')
-        .insert([locationData])
-        .select()
+        .select('id, last_updated')
+        .eq('user_id', locationData.user_id)
+        .maybeSingle()
       
-      if (error) throw error
-      return { success: true, data: data[0] }
+      if (fetchError) throw fetchError
+      
+      // Add last_updated timestamp and time_since_update
+      const now = new Date().toISOString()
+      let time_since_update = 'just now'
+      
+      // If this is an update, calculate the time since last update
+      if (existingData?.last_updated) {
+        const lastUpdated = new Date(existingData.last_updated)
+        const currentTime = new Date()
+        const diffSeconds = Math.floor((currentTime - lastUpdated) / 1000)
+        
+        if (diffSeconds < 60) {
+          time_since_update = `${diffSeconds} seconds ago`
+        } else {
+          const diffMinutes = Math.floor(diffSeconds / 60)
+          if (diffMinutes < 60) {
+            time_since_update = `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`
+          } else {
+            const diffHours = Math.floor(diffMinutes / 60)
+            if (diffHours < 24) {
+              time_since_update = `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`
+            } else {
+              const diffDays = Math.floor(diffHours / 24)
+              time_since_update = `${diffDays} day${diffDays === 1 ? '' : 's'} ago`
+            }
+          }
+        }
+      }
+      
+      const updatedData = {
+        ...locationData,
+        last_updated: now,
+        time_since_update
+      }
+      
+      let result
+      
+      if (existingData?.id) {
+        // Update existing record
+        console.log(`Updating existing location for ${locationData.user_id}`)
+        const { data, error } = await supabase
+          .from('locations')
+          .update(updatedData)
+          .eq('id', existingData.id)
+          .select()
+        
+        if (error) throw error
+        result = { success: true, data: data[0], isUpdate: true }
+      } else {
+        // Insert new record
+        console.log(`Creating new location for ${locationData.user_id}`)
+        const { data, error } = await supabase
+          .from('locations')
+          .insert([updatedData])
+          .select()
+        
+        if (error) throw error
+        result = { success: true, data: data[0], isUpdate: false }
+      }
+      
+      return result
     } catch (error) {
-      console.error('Error inserting location:', error)
+      console.error('Error upserting location:', error)
       return { success: false, error: error.message }
     }
   },
