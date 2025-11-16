@@ -22,6 +22,18 @@
   padding: 12px 40px;
 }
 
+@media (max-width: 768px) {
+  .maintenance-header {
+    padding: 8px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-header {
+    padding: 6px 15px;
+  }
+}
+
 .maintenance-header-inner {
   display: flex;
   justify-content: center;
@@ -43,12 +55,36 @@
   object-fit: contain;
 }
 
+@media (max-width: 768px) {
+  .maintenance-logo {
+    height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-logo {
+    height: 40px;
+  }
+}
+
 /* Main Content */
 .maintenance-main {
   flex: 1;
   padding: 30px 40px;
   display: flex;
   justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .maintenance-main {
+    padding: 20px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-main {
+    padding: 15px 15px;
+  }
 }
 
 .maintenance-card {
@@ -58,6 +94,20 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 24px 32px 32px;
   background: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .maintenance-card {
+    padding: 20px 24px 24px;
+    margin: 0 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-card {
+    padding: 16px 20px 20px;
+    margin: 0 5px;
+  }
 }
 
 .maintenance-info {
@@ -76,6 +126,21 @@
   font-size: 22px;
   letter-spacing: 1px;
   margin: 0 0 12px 0;
+}
+
+@media (max-width: 768px) {
+  .maintenance-title {
+    font-size: 20px;
+    letter-spacing: 0.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-title {
+    font-size: 18px;
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+  }
 }
 
 .maintenance-message {
@@ -102,6 +167,22 @@
   justify-content: center;
   gap: 32px;
   font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .maintenance-footer-links {
+    gap: 24px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-footer-links {
+    flex-direction: column;
+    gap: 12px;
+    font-size: 12px;
+    align-items: center;
+  }
 }
 
 .maintenance-footer-links span {
@@ -633,11 +714,31 @@
   justify-content: flex-end;
 }
 
+@media (max-width: 768px) {
+  .maintenance-security-footer {
+    padding: 8px 20px 16px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .maintenance-security-footer {
+    padding: 6px 15px 12px;
+  }
+}
+
 .maintenance-security-badge {
   border: 1px solid #d0d0d0;
   padding: 6px 12px;
   font-size: 12px;
   border-radius: 4px;
+}
+
+@media (max-width: 480px) {
+  .maintenance-security-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
 }
 
 /* Responsive Design */

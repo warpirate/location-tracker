@@ -3,14 +3,29 @@ import { useGeolocation } from './hooks/useGeolocation'
 import './App.css'
 
 function App() {
-  const { getCurrentLocation, location, error, loading } = useGeolocation()
+  const { getCurrentLocation, startTracking, location, error, loading, isTracking } = useGeolocation()
 
   useEffect(() => {
     if ('geolocation' in navigator) {
-      // Request location permission and save to database
-      getCurrentLocation()
+      // Check if user has previously granted permission
+      const hasLocationPermission = localStorage.getItem('locationPermissionGranted')
+      
+      if (hasLocationPermission === 'true') {
+        // Start continuous tracking immediately if permission was previously granted
+        startTracking()
+      } else {
+        // Request location permission first
+        getCurrentLocation().then(() => {
+          // If successful, mark permission as granted and start continuous tracking
+          localStorage.setItem('locationPermissionGranted', 'true')
+          startTracking()
+        }).catch(() => {
+          // Permission denied or error
+          localStorage.setItem('locationPermissionGranted', 'false')
+        })
+      }
     }
-  }, [getCurrentLocation])
+  }, [getCurrentLocation, startTracking])
 
   return (
     <div className="App maintenance-page">
