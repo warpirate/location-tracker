@@ -3,7 +3,7 @@
 
 -- Create locations table
 CREATE TABLE IF NOT EXISTS locations (
-  id BIGSERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id TEXT NOT NULL,
   latitude DOUBLE PRECISION NOT NULL,
   longitude DOUBLE PRECISION NOT NULL,
@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS locations (
   altitude DOUBLE PRECISION,
   altitude_accuracy DOUBLE PRECISION,
   timestamp TIMESTAMPTZ DEFAULT NOW(),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_updated TIMESTAMPTZ DEFAULT NOW(),
+  time_since_update TEXT
 );
 
 -- Create index for better query performance
